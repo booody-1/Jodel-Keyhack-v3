@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import time
-from flask import Flask, request, flash, redirect, render_template
+from flask import Flask, request, flash, redirect
 from flask_session import Session
 from werkzeug.utils import secure_filename
 import zipfile

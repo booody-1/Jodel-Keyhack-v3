@@ -28,6 +28,7 @@ class R2Instance:
     def extract_instructions(self):
         instructions = []
 
+        # https://memegenerator.net/img/instances/75909642/how-does-this-even-work.jpg
         disasm = [__d.replace('0x', '') for __d in
                     [_d for _d in [d for d in self.r2.cmd("s {}; pdf".format(self.function_name)).split('\r') if "mov" in d] if 'eax' in _d]]
         for d in disasm:
