@@ -1,11 +1,14 @@
 from ctypes import ARRAY, c_uint8, c_char_p, CDLL
 import os
 
+import re
+from decrypt import decrypt
+
 CLIENT_SECRET_SIZE = 40
 
-decrypt = CDLL(os.path.dirname(os.path.abspath(__file__)) + '\decrypt.dll')
-decrypt.decrypt.argtypes = [ARRAY(c_uint8, CLIENT_SECRET_SIZE)]
-decrypt.decrypt.restype = c_char_p
+#decrypt = CDLL(os.path.dirname(os.path.abspath(__file__)) + '\decrypt.dll')
+#decrypt.decrypt.argtypes = [ARRAY(c_uint8, CLIENT_SECRET_SIZE)]
+#decrypt.decrypt.restype = c_char_p
 
 class Extractor:
     def __init__(self):
@@ -24,10 +27,18 @@ class Extractor:
         print('Derived key of length {} from library, now decrypting it...'.format(len(key)))
 
         print('Key: {}'.format([key[x:x + 2] for x in range(0, len(key), 2)]))
-        c_array_key = (c_uint8 * len(key))(*key)
-        _result = decrypt.decrypt(c_array_key)
+        #c_array_key = (c_uint8 * len(key))(*key)
+        #_result = decrypt.decrypt(c_array_key)
+        _result = decrypt(key)
         print('Decryption successfull, key: {}'.format(_result))
         return _result
+
+    def method_regex(self, assembler_code):
+        _bytes = []
+        for disasm in assembler_code:
+            _bytes.append(re.search('(?<=, )\w+', disasm).group(1))
+
+
 
     def method1(self, assembler_code):
         key = ''

@@ -51,10 +51,11 @@ def upload():
         else:
             flash('File type not allowed, please upload a APK')
             return redirect(request.url)
-    return open(os.path.dirname(os.path.realpath(__file__)) + 'page.html', 'r').read()
+    return open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'page.html'), 'r').read()
 
 
 def process_file(path):
+    global r2instance
     r2instance = extract_zip(path)
     values = r2instance.extract_instructions()
     del r2instance
@@ -69,10 +70,10 @@ def extract_zip(path):
         if file.startswith('lib/') and file.find('x86') != -1:
             extracted_file = os.path.join(unzip_directory, archive.extract(file, unzip_directory))
             print(extracted_file)
-            with R2Instance(extracted_file) as r2instance:
-                if r2instance.is_correct_binary:
-                    return r2instance
-                else: del r2instance
+            with R2Instance(extracted_file) as _r2instance:
+                if _r2instance.is_correct_binary:
+                    return _r2instance
+                else: del _r2instance
 
 
 Flask.run(app)

@@ -1,4 +1,5 @@
 import r2pipe
+import re
 
 
 class R2Instance:
@@ -14,6 +15,12 @@ class R2Instance:
             self.is_correct_binary = True
             self.function_name = method_name
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
     def __del__(self):
         self.r2.quit()
 
@@ -26,18 +33,9 @@ class R2Instance:
         return None
 
     def extract_instructions(self):
-        instructions = []
-
+        instr = []
         # https://memegenerator.net/img/instances/75909642/how-does-this-even-work.jpg
-        disasm = [__d.replace('0x', '') for __d in
-                    [_d for _d in [d for d in self.r2.cmd("s {}; pdf".format(self.function_name)).split('\r') if "mov" in d] if 'eax' in _d]]
-        for d in disasm:
-            start_idx = d.find(',') + 2
-            end_idx = len(d)
-            if d.find(";") != -1:
-                end_idx = d.find(";")
-
-            instructions.append(d[start_idx:end_idx].strip())
-
-        return instructions
+        [instr.append(re.search('(?<=, )\w+', ___d).group(0)) for ___d in [__d.replace('0x', '') for __d in
+                [_d for _d in [d for d in self.r2.cmd("s {}; pdf".format(self.function_name)).split('\r') if "mov" in d] if 'eax' in _d]]]
+        return instr
 
