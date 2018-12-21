@@ -51,7 +51,7 @@ def upload():
         else:
             flash('File type not allowed, please upload a APK')
             return redirect(request.url)
-    return open('page.html', 'r').read()
+    return open(os.path.dirname(os.path.realpath(__file__)) + 'page.html', 'r').read()
 
 
 def process_file(path):
