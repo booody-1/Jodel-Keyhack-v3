@@ -51,15 +51,8 @@ def upload():
         else:
             flash('File type not allowed, please upload a APK')
             return redirect(request.url)
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    return open(os.path.dirname(os.path.realpath(__file__)) + 'page.html', 'r').read()
+
 
 def process_file(path):
     r2instance = extract_zip(path)

@@ -1,3 +1,4 @@
 werkzeug
 flask
+flask_session
 r2pipe
