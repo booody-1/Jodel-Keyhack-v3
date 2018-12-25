@@ -1,4 +1,8 @@
-werkzeug
-flask
-flask_session
-r2pipe
+Click==7.0
+Flask==1.0.2
+Flask-Session==0.3.1
+itsdangerous==1.1.0
+Jinja2==2.10
+MarkupSafe==1.1.0
+r2pipe==1.2.0
+Werkzeug==0.14.1
