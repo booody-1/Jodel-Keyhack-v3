@@ -4,10 +4,11 @@ import tempfile
 import time
 
 import jodel_api
-from flask import Flask, request, flash, redirect
-from flask_session import Session
+import shutil
+from flask import Flask, request, redirect
 from werkzeug.utils import secure_filename
 import zipfile
+from magic import magic
 
 import decrypt
 from aapt import Aapt
@@ -16,16 +17,7 @@ from r2instance import R2Instance
 UPLOAD_FOLDER = tempfile.gettempdir()
 ALLOWED_EXTENSIONS = {'apk'}
 
-r2instance = None
-aapt = Aapt()
-uploaded_file = None
-zip_directory = None
-
 app = Flask(__name__)
-# Check Configuration section for more details
-SESSION_TYPE = 'null'
-app.config.from_object(__name__)
-sess = Session(app)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -36,15 +28,10 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
-        # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
             return redirect(request.url)
         file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
         if file.filename == '':
-            flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -52,16 +39,44 @@ def upload():
             file.save(filepath)
             return process_file(filepath)
         else:
-            flash('File type not allowed, please upload a APK')
-            return redirect(request.url)
+            return 'File type not allowed, please upload a APK'
     return open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'files/static/html/page.html'), 'r').read()
 
 
-def process_file(path):
-    retval = aapt.get_apk_info(path)
-    retval['hmac_key'] = decrypt.decrypt(extract_zip(path).extract_bytes()).decode("utf-8")
-    retval['key_status'] = is_key_working(retval['hmac_key'], retval['version']['name'])
-    return jodel_api.json.dumps(retval, sort_keys=True, indent=4)
+def is_file_valid(file_path):
+    _magic = magic.Magic(mime=magic.MAGIC_MIME)
+    print(_magic.from_file(file_path))
+    if _magic.from_file(file_path) != 'application/zip':
+        print(_magic.from_file(file_path))
+        return False
+    if not _magic:
+        del _magic
+
+    return True
+
+def process_file(apk_file_path):
+    if not is_file_valid(apk_file_path):
+        return 'File not valid.'
+    r2instance, unzip_directory = extract_zip(apk_file_path)
+    jodel_info = Aapt().get_apk_info(apk_file_path)
+    clear_up_mess(apk_file_path, unzip_directory)
+    if r2instance is None:
+        return 'Library file not found, exiting...'
+    jodel_info['hmac_key'] = decrypt.decrypt(r2instance.extract_bytes()).decode("utf-8")
+    jodel_info['key_status'] = is_key_working(jodel_info['hmac_key'], jodel_info['version']['name'])
+    return jodel_api.json.dumps(jodel_info, sort_keys=True, indent=4)
+
+def clear_up_mess(apk_file_path, extracted_file_path):
+    try:
+        if apk_file_path and os.path.isfile(apk_file_path):
+            os.remove(apk_file_path)
+            print('Removed APK file')
+
+        if extracted_file_path and os.path.isdir(extracted_file_path):
+            shutil.rmtree(extracted_file_path)
+            print('Removed extracted files')
+    except:
+        print('failed to remove files')
 
 
 def extract_zip(path):
@@ -71,10 +86,12 @@ def extract_zip(path):
             if file.startswith('lib/') and file.find('x86') != -1:
                 extracted_file = os.path.join(unzip_directory, archive.extract(file, unzip_directory))
                 with R2Instance(extracted_file) as _r2instance:
-                    if _r2instance.is_correct_binary:
-                        return _r2instance
+                    print(magic.from_file(extracted_file, mime=True))
+                    if _r2instance.is_correct_binary and magic.from_file(extracted_file, mime=True) == 'application/x-sharedlib':
+                        return _r2instance, unzip_directory
                     else: del _r2instance
 
+    return None, unzip_directory
 
 def is_key_working(key, version):
     try:
@@ -85,4 +102,5 @@ def is_key_working(key, version):
         return {'working':False}
 
 
-Flask.run(app)
+if __name__ == '__main__':
+    Flask.run(app)
