@@ -3,8 +3,6 @@ from collections import OrderedDict
 import r2pipe
 import re
 
-import decrypt
-
 R2_LIST_FUNCTIONS = 'afl'
 R2_DISASSEMBLE_INSTRUCTIONS = 's {}; pi 25'
 
@@ -20,7 +18,7 @@ def rev(a):
 
 class R2Instance:
     def __init__(self, path):
-        self.r2 = r2pipe.open(path, radare2home="C:\\Users\\Admin\\AppData\\Local\\Programs\\radare2")
+        self.r2 = r2pipe.open(path)
         self.r2.cmd('aa')
         self.is_correct_binary = False
 
