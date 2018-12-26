@@ -17,7 +17,7 @@ from r2instance import R2Instance
 UPLOAD_FOLDER = tempfile.gettempdir()
 ALLOWED_EXTENSIONS = {'apk'}
 
-app = Flask(__name__, static_url_path="/",
+app = Flask(__name__, static_url_path="/static",
             static_folder="../frontend-dist")
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
