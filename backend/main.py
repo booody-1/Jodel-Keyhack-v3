@@ -4,8 +4,8 @@ import shutil, zipfile, jodel_api, tempfile
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from magic import magic
-from backend.r2instance import R2Instance
-from backend.decrypt import decrypt
+from r2instance import R2Instance
+from decrypt import decrypt
 from apkverify import ApkSignature
 from pyaxmlparser import APK
 
