@@ -20,3 +20,21 @@ pip install -r requirements.txt
 # Run
 python3 backend/main.py
 ```
+
+# Install on macOS
+
+1. Install requirements
+   - `brew install radare2`
+   - `brew install nodejs`
+   - `brew install python3`
+2. Create virtual env
+   - `python3 -m venv venv`
+3. Activate virtualenv
+   - `. venv/bin/activate`
+4. Install python deps
+   - `pip install -r requirements.txt`
+5. Build frontend
+   - `npm ci`
+   - `npm run build:prod`
+6. Start backend
+   - `python3 backend/main.py`
