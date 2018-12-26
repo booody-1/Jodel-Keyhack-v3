@@ -18,5 +18,5 @@ venv\Scripts\activate # on Windows
 pip install -r requirements.txt
 
 # Run
-python3 src/main.py
+python3 backend/main.py
 ```
