@@ -1,5 +1,5 @@
-apkverify
-pyaxmlparser
+-e git+https://github.com/krokofant/apk-signature-verify.git@6377d0dfb06796517b32eb901dd4c1da430131ac#egg=apkverify
+asn1crypto==0.24.0
 autopep8==1.4.3
 certifi==2018.11.29
 chardet==3.0.4
@@ -10,10 +10,12 @@ idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10
 -e git+https://github.com/Unbrick/jodel_api.git@be12ddcabd59b9fcd9ad08c1ff703a05b1d08b00#egg=jodel_api
+lxml==4.2.5
 MarkupSafe==1.1.0
 mock==2.0.0
 pbr==5.1.1
 protobuf==3.6.1
+pyaxmlparser==0.3.13
 pycodestyle==2.4.0
 python-magic-bin==0.4.14
 r2pipe==1.2.0
