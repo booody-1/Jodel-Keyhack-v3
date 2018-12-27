@@ -2,23 +2,23 @@
 
 # Install on Windows
 
-0. Use package managers
-   - [Chocolatey](https://chocolatey.org/) for programs
-   - [scoop](https://scoop.sh/) for dev tools
+(for Windows) Install package manager [Chocolatey](https://chocolatey.org/) for programs and
+[scoop](https://scoop.sh/) for dev tools
+
 1. Install requirements
    - `scoop install radare2`
    - `choco install nodejs`
    - `choco install python3`
-1. Create virtual env
+2. Create virtual env
    - `py -3 -m venv venv`
-1. Activate virtualenv
+3. Activate virtualenv
    - `venv\Scripts\activate`
-1. Install python deps
+4. Install python deps
    - `pip install -r requirements.txt`
-1. Build frontend
+5. Build frontend
    - `npm ci`
    - `npm run build:prod`
-1. Start backend
+6. Start backend
    - `python3 backend/main.py`
 
 # Install on macOS
