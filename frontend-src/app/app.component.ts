@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { UploadChangeParam } from "ng-zorro-antd";
+import { UploadChangeParam, UploadFile } from "ng-zorro-antd";
 
 export interface UploadResponse {
   package: string;
@@ -22,14 +22,16 @@ export interface UploadResponse {
 export class AppComponent {
   successfulExtraction = false;
   extractionData: UploadResponse;
+  fileList: UploadFile[] = [];
 
   fileChange(uploadChangeParam: UploadChangeParam) {
-    const { type, file } = uploadChangeParam;
+    const { type, file, fileList } = uploadChangeParam;
     if (type === "success") {
       this.extractionData = file.response;
       this.successfulExtraction = true;
     } else {
       this.successfulExtraction = false;
+      this.fileList = fileList.slice(-1);
     }
   }
 }

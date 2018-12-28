@@ -6,6 +6,7 @@
           nzType="drag"
           nzAction="/upload"
           nzAccept=".apk"
+          [nzFileList]="fileList"
           (nzChange)="fileChange($event)"
         >
           <p class="ant-upload-drag-icon"><i nz-icon type="inbox"></i></p>
