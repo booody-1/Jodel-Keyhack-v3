@@ -1,4 +1,4 @@
-#"Hacking" Jodel
+# "Hacking" Jodel
 ### Bypass SSL-Pinning
 This script is for use with [frida](https://frida.re/). As Jodel is heavily obfuscated, hooking the Jodels enableSslPinning method is nearly impossible. 
 But: Jodel is using the `okhttp3.CertificatePinner$Pin` which utilizes `okio.ByteString#equals` to compare the certificates. By letting `equals` always return `true`, any ServerCertificate, provided by you will get accepted. 
