@@ -43,7 +43,7 @@ payload: GET%api.go-tellm.com%443%/api/v3/posts/location/combo%39422506-d25adbe9
 ```
 
 
-As of that, i wrote a python script which disassembles the shared object, collects the bytes and decrypts it (credits for the decryption magic to [cfib90](https://bitbucket.org/cfib90/ojoc-keyhack)). To make it look better 
+As of that, i wrote a python script which disassembles the shared object, collects the bytes and decrypts it (credits for the decryption magic to [cfib90](https://bitbucket.org/cfib90/ojoc-keyhack)). To make it look better i developed this keyhack with fancy angular gui.
 
 ---
 
@@ -84,6 +84,3 @@ script.load()
 sys.stdin.read()
 ```
 ---
-
-### Why is the [jodel_api](https://github.com/nborrmann/jodel_api) broken?
-As far as i found out, it has nothing to do with the signing algorithm.
