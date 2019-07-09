@@ -4,8 +4,8 @@ import shutil, zipfile, jodel_api, tempfile
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from magic import magic
+import backend.decrypt as decrypt
 from r2instance import R2Instance
-from decrypt import decrypt
 from apkverify import ApkSignature
 from pyaxmlparser import APK
 
@@ -32,7 +32,9 @@ def upload():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        return jodel_api.json.dumps(process_file(filepath))
+        retval = jodel_api.json.dumps(process_file(filepath))
+        print(retval)
+        return retval
 
     else:
         return {'error':True, 'message': 'File type not allowed!'}
@@ -51,26 +53,26 @@ def gather_apk_information(apk_file_path):
             verify = sign.verify(2)
             if sign.get_certs() == JODEL_CERTIFICATE:
                 is_jodel_signature = True
-        return {'package': apk.package, 'version_name': apk.version_name,
+        return {'error':False, 'package': apk.package, 'version_name': apk.version_name,
                 'version_code': apk.version_code, 'signature_verified': verify,
                 'is_jodel_signature': is_jodel_signature, 'certs': str(sign.get_certs())}
     except:
-        return 'Failed verifying APK file'
+        return {'error':True, 'message': 'Failed verifying APK file!'}
 
 def process_file(apk_file_path):
     apk_information = gather_apk_information(apk_file_path)
-    if apk_information and apk_information['is_jodel_signature']:
+    if not apk_information['error']: #and apk_information['is_jodel_signature']
         r2instance, unzip_directory = extract_zip(apk_file_path)
         clean_up_mess(apk_file_path, unzip_directory)
         if r2instance is None:
             return {'error':True, 'message': 'Library file not found, exiting...'}
-        apk_information['hmac_key'] = decrypt(r2instance.extract_bytes()).decode("utf-8")
+        apk_information['hmac_key'] = decrypt.decrypt(r2instance.key).decode("utf-8")
         apk_information['key_status'] = is_key_working(apk_information['hmac_key'], apk_information['version_name'])
         apk_information['error'] = False
         apk_information['message'] = 'Successfully extracted key!'
-        return apk_information
-    else:
-        return {'error':True, 'message': apk_information}
+
+    return apk_information
+
 
 
 def clean_up_mess(apk_file_path, extracted_file_path):
@@ -104,14 +106,14 @@ def extract_zip(path):
 
 def is_key_working(key, version):
     try:
-        lat, lng, city = 48.148435, 11.567866, "Munich"
-        j = jodel_api.JodelAccount(
-            lat=lat, lng=lng, city=city, _secret=key, _version=version)
+        lat, lng, city = 48.148900, 11.567400, "Munich"
+        j = jodel_api.JodelAccount(lat=lat, lng=lng, city=city)
         return {'working': True, 'account': j.get_account_data()}
-    except:
+    except Exception as e:
+        print(e)
         return {'working': False}
 
 
 if __name__ == '__main__':
-    Flask.run(app)
+    Flask.run(app, debug=True)
 
