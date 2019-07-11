@@ -45,7 +45,22 @@ This method refers to `sym.Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_
 GET@/api/v3/user/config
 ```
 
-Not sure what it is useful for.
+Seems like this realizes some kind of a queue. A signing request is coming in and getting queued in a std::map<string,int>. The sign routine uses the values of the map to locate the signing request. Pseudocode of the register-function looks like this:
+
+```
+void Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_register(JNIEnv env, jobject jobj, char *reg)
+{
+    char *reg_utf;
+    int *index_in_map;
+    std::map<std::string, int> queue = (std::map<std::string,int>) &dword_xxxx;
+
+    reg_utf = env->GetStringUTFChars(env, reg);
+    index_in_map = queue[reg_utf];
+    ++*index_in_map;
+    env->ReleaseStringUTFChars(env, reg);
+    //do some deallocation
+}
+```
 
 #### private native synchronized byte[] sign(String sig, String method, byte[] payload);
 Sign refers to `sym.Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_sign`. It takes three arguments:
