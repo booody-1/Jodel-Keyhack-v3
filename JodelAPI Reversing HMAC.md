@@ -1,5 +1,4 @@
-# "Hacking" Jodel
-## How does the HMAC-Signing work?
+### How does the HMAC-Signing in Jodel work?
 First of all read [this](https://en.wikipedia.org/wiki/HMAC)! It's important to understand what HMAC is used for in order to understand what Jodel is doing there.
 
 Hmac requires a key. Jodel stores this key not in plain text, as it would be way too easy to read it. They are storing it XORed with the APKs signature inside a shared object. (<apk>/lib/<arch>/libx.so). The signing inside the jodel application works as follows:
@@ -11,7 +10,21 @@ The class `com.jodelapp.jodelandroidv3.api.HmacInterceptor` is responsible for t
 - private native synchronized byte[] sign(String str, String str2, byte[] bArr);
 ```
 
-### private native void init();
+---
+
+### Extracting the HMAC-Key
+There are multiple methods extracting the hmac-key:
+- Good old static way
+	- Extracting the hmac-key the static way requires the hmac-signing library (as the base key is in there) and some decryption magic. There are several projects doing this, some of them work, some dont. The ones i'm aware of are: 
+		- [ojoc-keyhack by cfib90](https://bitbucket.org/cfib90/ojoc-keyhack) (the original one, utilizing objdump)
+		- [Jodel-Keyhack-v2](https://github.com/Unbrick/Jodel-Keyhack-v2) utilizing IDA Pro 7.x
+		- [Jodel-Keyhack-v3](https://github.com/Unbrick/Jodel-Keyhack-v3) this project, utilizing radare2
+- Dynamic (runtime hooking ftw!)
+	- As the native library is NOT implementing their own HMAC-Signing function, they are using the one javax.crypto classes. Hooking them using librarys like frida is [pretty easy](https://gist.github.com/Unbrick/c7151e44c4abf37cc0a6bc9d850b6a4a) (See comment for instructions)
+
+---
+
+#### private native void init();
 This method generates the HMAC-Key in ram. It refers to `sym.Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_init` in the corresponding shared object.
 
 Reading the assembler code (of the x86 binary) looks like this:
@@ -26,7 +39,7 @@ mov dword [eax + 0x199], 0x8c0dd9e9
 
 Thinking of `eax` as the start of a byte[], the assembler code just fills a byte array.
 
-### private native synchronized void register(String str);
+#### private native synchronized void register(String str);
 This method refers to `sym.Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_register`. It takes one String parameter which describes what kind of request is going to be signed. For instance:
 ```
 GET@/api/v3/user/config
@@ -34,7 +47,7 @@ GET@/api/v3/user/config
 
 Not sure what it is useful for.
 
-### private native synchronized byte[] sign(String sig, String method, byte[] payload);
+#### private native synchronized byte[] sign(String sig, String method, byte[] payload);
 Sign refers to `sym.Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_sign`. It takes three arguments:
 ```
 sig: The APKs SHA1 signature: a4a8d4d7b09736a0f65596a868cc6fd620920fb0 (should be always this value!)
