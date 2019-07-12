@@ -1,4 +1,4 @@
-# r2HmacExtractor
+# Jodel Keyhack v3 (now with fancy angular gui)
 
 # Install on Windows
 
