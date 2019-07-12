@@ -7,8 +7,7 @@
           nzAction="/api/upload"
           nzAccept=".apk"
           [nzFileList]="fileList"
-          (nzChange)="fileChange($event)"
-        >
+          (nzChange)="fileChange($event)">
           <p class="ant-upload-drag-icon"><i nz-icon type="inbox"></i></p>
           <p class="ant-upload-text">Upload Jodel APK</p>
           <p class="ant-upload-hint">Just drag and drop the APK file</p>
@@ -20,8 +19,7 @@
       <nz-card style="width:550px;">
         <div nz-row>
           <div nz-col nzSpan="12">Offical Jodel APK</div>
-          <div nz-col nzSpan="12">
-            {{ extractionData.is_jodel_signature ? "Yes" : "No" }}
+          <div nz-col nzSpan="12"> {{ extractionData.is_jodel_signature ? "Yes" : "No" }}
           </div>
         </div>
         <div nz-row>

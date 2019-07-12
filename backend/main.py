@@ -46,16 +46,9 @@ def allowed_file(filename):
 def gather_apk_information(apk_file_path):
     try:
         apk = APK(apk_file_path)
-        sign = ApkSignature(apkpath=apk_file_path)
-        is_jodel_signature = False
-        verify = False
-        if sign.is_sigv2():
-            verify = sign.verify(2)
-            if sign.get_certs() == JODEL_CERTIFICATE:
-                is_jodel_signature = True
         return {'error':False, 'package': apk.package, 'version_name': apk.version_name,
-                'version_code': apk.version_code, 'signature_verified': verify,
-                'is_jodel_signature': is_jodel_signature, 'certs': str(sign.get_certs())}
+                'version_code': apk.version_code,
+                'is_jodel_signature': True if apk.package == 'com.tellm.android.app' else False}
     except:
         return {'error':True, 'message': 'Failed verifying APK file!'}
 
