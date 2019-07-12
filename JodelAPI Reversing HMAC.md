@@ -71,6 +71,20 @@ payload: GET%api.go-tellm.com%443%/api/v3/posts/location/combo%39422506-d25adbe9
 ```
 
 
+The pseudocode of this function looks like this:
+
+```
+int Java_com_jodelapp_jodelandroidv3_api_HmacInterceptor_sign(JNIEnv *env, jobject jobj, char *sig_1, char *key_in_map, char *hmac_input){
+	secretKey = signature ^ xor_key; //a little more complicated but basically this
+	
+	//do java calls from C, java code would look like this
+	SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
+	Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+	mac.init(signingKey);
+	return toHexString(mac.doFinal(data.getBytes()));
+}
+```
+
 As of that, i wrote a python script which disassembles the shared object, collects the bytes and decrypts it (credits for the decryption magic to [cfib90](https://bitbucket.org/cfib90/ojoc-keyhack)). To make it look better i developed this keyhack with fancy angular gui.
 
 ---
