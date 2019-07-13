@@ -3,9 +3,9 @@ import shutil, zipfile, jodel_api, tempfile
 
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
-from magic import magic
+import magic
 import backend.decrypt as decrypt
-from r2instance import R2Instance
+from backend.r2instance import R2Instance
 from apkverify import ApkSignature
 from pyaxmlparser import APK
 
@@ -108,5 +108,5 @@ def is_key_working(key, version):
 
 
 if __name__ == '__main__':
-    Flask.run(app, debug=True)
+    Flask.run(app, debug=False)
 

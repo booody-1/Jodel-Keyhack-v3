@@ -17,7 +17,6 @@ pbr==5.1.1
 protobuf==3.6.1
 pyaxmlparser==0.3.13
 pycodestyle==2.4.0
-python-magic-bin==0.4.14
 r2pipe==1.2.0
 requests==2.21.0
 six==1.12.0
