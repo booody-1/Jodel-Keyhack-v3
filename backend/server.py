@@ -1,25 +1,23 @@
-import os, time
-import shutil, zipfile, jodel_api, tempfile
+import shutil, zipfile, jodel_api, tempfile, os, time
 
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
-import magic
 import backend.decrypt as decrypt
 from backend.r2instance import R2Instance
-from apkverify import ApkSignature
 from pyaxmlparser import APK
 
 UPLOAD_FOLDER = tempfile.gettempdir()
 ALLOWED_EXTENSIONS = {'apk'}
-JODEL_CERTIFICATE = [b'-----BEGIN CERTIFICATE-----\nMIIDYTCCAkmgAwIBAgIEMb0w6zANBgkqhkiG9w0BAQsFADBhMQswCQYDVQQGEwJE\nRTEPMA0GA1UECBMGQmVybGluMQ8wDQYDVQQHEwZCZXJsaW4xDjAMBgNVBAoTBXRl\nbGxNMRAwDgYDVQQLEwdBbmRyb2lkMQ4wDAYDVQQDEwV0ZWxsTTAeFw0xNDA0MDMx\nOTAzMjVaFw00MTA4MTkxOTAzMjVaMGExCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZC\nZXJsaW4xDzANBgNVBAcTBkJlcmxpbjEOMAwGA1UEChMFdGVsbE0xEDAOBgNVBAsT\nB0FuZHJvaWQxDjAMBgNVBAMTBXRlbGxNMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A\nMIIBCgKCAQEAnE4nlpDzirbpQxzz1m46lSIdyv1HfgpxtsD1jgc6Le24TT7qfase\nGsheUjvpwl680lrR6H2KJT1beR+WIRAgqyUOWT08y9yRU+Gql+kh7zNXRf/H9UfF\n2qamVjq3/piBlQZgYmJuSkVAIFDOPk2f3x8WhID5nN4E+Qa2n/M2kN2GmhDX7j5q\nk1F1/V8lgsz+WdIVj9Z/rNcA5whmDbS3gYmzf2qrpODHf84Ns1fh9ip3WZAzQO3J\nspQB5OZA64w4n15/FjJSl86nHz0OpZ1dGJ4i7arc8ljmH4TzlgktX6GVLgqTtTVR\ncZh7qdMEJtiBNFR2Zav6z05K03RP3C/BUwIDAQABoyEwHzAdBgNVHQ4EFgQU0kzF\ntcTfHGyOuM6xuhVmGcI6AwEwDQYJKoZIhvcNAQELBQADggEBAC91lekfq5MNqlDB\nT/OrDBTHhX6xHtMfTIpO4jmNEyPrnGyKWW/CWP3qodX7RYEZ20l/ydKj0r2zDkW5\nLQaG4kTr7YMDzAZZwyq2txqqxrOj6ssfl0B8JQgiGG38bPQGucy2Q0NJBbkNTVOI\nG496IFaPe1RcjtONvMSdRsBXt+90RFER3pMRYYYqy79SjAZrRF0C5KLwONfhFo7f\ni29Lf0uMFYaE4jOpD8kwLiFpdMbLjGhvdziQVAybChf8H0xw8jKRNED7L/axC1q0\n8HNW5OCI4JuQIvcf6BPxAIepo0mnNZVSYR9MHZrMI3qFDzAAuyuJk5y5ZMVgJqBU\n8DZbptk=\n-----END CERTIFICATE-----\n']
 
 app = Flask(__name__, static_url_path="/static", static_folder="../frontend-dist")
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 @app.route('/', methods=['GET'])
 def index():
     return redirect(url_for('static', filename='index.html'))
+
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
@@ -32,16 +30,15 @@ def upload():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        retval = jodel_api.json.dumps(process_file(filepath))
-        print(retval)
-        return retval
-
+        return jodel_api.json.dumps(process_file(filepath))
     else:
         return {'error':True, 'message': 'File type not allowed!'}
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def gather_apk_information(apk_file_path):
     try:
@@ -52,9 +49,10 @@ def gather_apk_information(apk_file_path):
     except:
         return {'error':True, 'message': 'Failed verifying APK file!'}
 
+
 def process_file(apk_file_path):
     apk_information = gather_apk_information(apk_file_path)
-    if not apk_information['error']: #and apk_information['is_jodel_signature']
+    if not apk_information['error']:
         r2instance, unzip_directory = extract_zip(apk_file_path)
         clean_up_mess(apk_file_path, unzip_directory)
         if r2instance is None:
@@ -65,7 +63,6 @@ def process_file(apk_file_path):
         apk_information['message'] = 'Successfully extracted key!'
 
     return apk_information
-
 
 
 def clean_up_mess(apk_file_path, extracted_file_path):
@@ -89,7 +86,7 @@ def extract_zip(path):
                 extracted_file = os.path.join(
                     unzip_directory, archive.extract(file, unzip_directory))
                 _r2instance = R2Instance(extracted_file)
-                if _r2instance.is_correct_binary and magic.from_file(extracted_file, mime=True) == 'application/x-sharedlib':
+                if _r2instance.is_correct_binary:
                     return _r2instance, unzip_directory
                 else:
                     del _r2instance
