@@ -2,8 +2,8 @@ import shutil, zipfile, jodel_api, tempfile, os, time
 
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
-import backend.decrypt as decrypt
-from backend.r2instance import R2Instance
+import decrypt as decrypt
+from r2instance import R2Instance
 from pyaxmlparser import APK
 
 UPLOAD_FOLDER = tempfile.gettempdir()
