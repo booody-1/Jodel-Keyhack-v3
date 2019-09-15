@@ -37,4 +37,4 @@
    - `npm ci`
    - `npm run build:prod`
 6. Start backend
-   - `python3 backend/main.py`
+   - `python3 backend/server.py`
